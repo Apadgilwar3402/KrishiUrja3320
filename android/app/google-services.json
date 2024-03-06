@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1069347566143",
+    "project_id": "krishiurja-3320",
+    "storage_bucket": "krishiurja-3320.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1069347566143:android:30404297cb63a40583fe8a",
+        "android_client_info": {
+          "package_name": "com.example.modernlogintute"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDi3ISML9uI5rO3UqKhmENn3muJBU5qME"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

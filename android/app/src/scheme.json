@@ -1,0 +1,18 @@
+{
+  "schemes": {
+    "scheme_id_1": {
+      "name": "Scheme A",
+      "description": "This is a brief description of Scheme A.",
+      "details": {
+        "more_details": "Additional details about Scheme A."
+      }
+    },
+    "scheme_id_2": {
+      "name": "Scheme B",
+      "description": "This is a brief description of Scheme B.",
+      "details": {
+        "more_details": "Additional details about Scheme B."
+      }
+    }
+  }
+}
