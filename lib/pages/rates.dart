@@ -1,22 +1,17 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../components/app_drawer.dart';
 
-class RatesPage extends StatefulWidget {
-  const RatesPage({super.key});
-
-  @override
-  _RatesPageState createState() => _RatesPageState();
-}
-
-class _RatesPageState extends State<RatesPage> {
-  get user => null; // Placeholder for potential user data
-
+class RatesPage extends StatelessWidget {
+  final User user;
+  const RatesPage({required this.user});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Rates')),
-      drawer: AppDrawer(user: user), // Add the app drawer here
+      appBar: AppBar(
+        title: const Text('Rates'),
+      ),
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance.collection('Rates').snapshots(),
         builder: (context, snapshot) {
@@ -30,13 +25,13 @@ class _RatesPageState extends State<RatesPage> {
               final document = documents[index];
               return ListTile(
                 title: Text(document['cropName']),
-                subtitle: Text('₹ ${document['price'].toStringAsFixed(2)}'), // Format price with two decimal places
+                subtitle: Text('₹ ${document['price'].toStringAsFixed(2)}'),
                 onTap: () {
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
                       title: Text(document['cropName']),
-                      content: Text('Price: ₹ ${document['price'].toStringAsFixed(2)}'), // Display price in dialog
+                      content: Text('Price: ₹ ${document['price'].toStringAsFixed(2)}'),
                     ),
                   );
                 },
@@ -45,6 +40,7 @@ class _RatesPageState extends State<RatesPage> {
           );
         },
       ),
+      drawer: AppDrawer(user: user),
     );
   }
 }

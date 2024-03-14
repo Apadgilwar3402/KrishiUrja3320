@@ -50,6 +50,8 @@ dependencies:
   firebase_database: ^10.4.7
   intl: ^0.17.0
   google_fonts: ^4.0.4
+  regexpattern: ^2.6.0
+
 
 
 dev_dependencies:

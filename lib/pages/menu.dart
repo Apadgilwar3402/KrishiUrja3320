@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:modernlogintute/pages/scheme.dart';
 import 'package:modernlogintute/pages/weather.dart';
+import 'package:modernlogintute/pages/renting.dart';
 
 class menu extends StatefulWidget {
   const menu({super.key});
@@ -48,20 +49,19 @@ class _menuState extends State<menu> {
                   color: Colors.grey[350],
                   borderRadius: BorderRadius.circular(16.0),
                   image: const DecorationImage(
-                    image: AssetImage('images/renting.jpg'),
+                    image: AssetImage('lib/images/renting.jpg'),
                     fit: BoxFit.cover,
                   ),
                 ),
                 margin: const EdgeInsets.all(16.0),
                 child: GestureDetector(
-                  onTap: () {
-                  },
-                  child: const Center(
-                    child: Text(
-                      'Renting',
-                      style: TextStyle(fontSize: 24 ,color:Colors.white),
+                  onTap: () {Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => Renting(),
                     ),
-                  ),
+                  );
+                  },
+                  child: const Center(child: Text('Renting', style: TextStyle(fontSize: 24 ,color:Colors.white),),),
                 ),
               ),
             ),
@@ -71,7 +71,7 @@ class _menuState extends State<menu> {
                   color: Colors.grey[350],
                   borderRadius: BorderRadius.circular(16.0),
                   image: const DecorationImage(
-                    image: AssetImage('images/weather.jpg'),
+                    image: AssetImage('lib/images/weather.jpg'),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -83,7 +83,7 @@ class _menuState extends State<menu> {
                     ),
                   );
                   },
-                  //child: const Center(child: Text('Scheme', style: TextStyle(fontSize: 24 ,color:Colors.white),),),
+                  child: const Center(child: Text('Weather', style: TextStyle(fontSize: 24 ,color:Colors.white),),),
                 ),
               ),
             ),
@@ -93,7 +93,7 @@ class _menuState extends State<menu> {
                   color: Colors.grey[350],
                   borderRadius: BorderRadius.circular(16.0),
                   image: const DecorationImage(
-                    image: AssetImage('images/rate.jpg'),
+                    image: AssetImage('lib/images/rate.jpg'),
                     fit:BoxFit.cover,
                   ),
                 ),
@@ -116,7 +116,7 @@ class _menuState extends State<menu> {
                   color: Colors.grey[350],
                   borderRadius: BorderRadius.circular(16.0),
                   image: const DecorationImage(
-                    image: AssetImage('images/scheme.jpg'),
+                    image: AssetImage('lib/images/scheme.jpg'),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -128,7 +128,7 @@ class _menuState extends State<menu> {
                     ),
                   );
                   },
-                  //child: const Center(child: Text('Scheme', style: TextStyle(fontSize: 24 ,color:Colors.white),),),
+                  child: const Center(child: Text('Scheme', style: TextStyle(fontSize: 24 ,color:Colors.white),),),
                 ),
               ),
             ),

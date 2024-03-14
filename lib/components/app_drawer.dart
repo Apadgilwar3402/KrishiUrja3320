@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:modernlogintute/pages/renting.dart';
 import 'package:modernlogintute/pages/weather.dart';
-
+import '../pages/rates.dart';
 import '../pages/scheme.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -67,7 +68,9 @@ class AppDrawer extends StatelessWidget {
             title: const Text('Renting'),
             leading: const Icon(Icons.agriculture),
             onTap: () {
-              // Navigate to the renting module
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Renting() ),);
             },
           ),
           ListTile(
@@ -84,7 +87,11 @@ class AppDrawer extends StatelessWidget {
             title: const Text('Rates'),
             leading: const Icon(Icons.attach_money),
             onTap: () {
-              // Navigate to the rates and schemes module
+              // Navigate to the rates page
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => RatesPage(user: user)),
+              );
             },
           ),
           ListTile(
