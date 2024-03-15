@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import, camel_case_types, library_private_types_in_public_api
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,6 +7,8 @@ import '../components/app_drawer.dart';
  // Import the app drawer
 
 class scheme extends StatefulWidget {
+  const scheme({super.key});
+
   @override
   _schemeState createState() => _schemeState();
 }
@@ -15,13 +19,13 @@ class _schemeState extends State<scheme> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Schemes')),
+      appBar: AppBar(title: const Text('Schemes')),
       drawer: AppDrawer(user: user), // Add the app drawer here
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance.collection('schemes').snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
           final documents = snapshot.data!.docs;
           return ListView.builder(

@@ -1,4 +1,6 @@
 // WishlistScreen.dart
+// ignore_for_file: use_key_in_widget_constructors, library_private_types_in_public_api, file_names, unnecessary_string_escapes
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -38,10 +40,10 @@ class _WishlistScreenState extends State<WishlistScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Wishlist'),
+        title: const Text('Wishlist'),
       ),
       body: wishlistItems!.isEmpty
-          ? Center(
+          ? const Center(
         child: Text('Your wishlist is empty.'),
       )
           : ListView.builder(

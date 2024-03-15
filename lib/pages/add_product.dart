@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api, prefer_final_fields, use_build_context_synchronously
+
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AddProductPage extends StatefulWidget {
+  const AddProductPage({super.key});
+
   @override
   _AddProductPageState createState() => _AddProductPageState();
 }
@@ -106,10 +110,10 @@ class _AddProductPageState extends State<AddProductPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Product'),
+        title: const Text('Add Product'),
       ),
       body: ListView(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         children: [
           pickedImage != null
               ? Container(
@@ -131,30 +135,30 @@ class _AddProductPageState extends State<AddProductPage> {
                 });
               }
             },
-            icon: Icon(Icons.camera_alt),
+            icon: const Icon(Icons.camera_alt),
           ),
           TextField(
             controller: productNameController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: 'Product Name',
             ),
           ),
           TextField(
             controller: productDescriptionController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: 'Product Description',
             ),
           ),
           TextField(
             controller: productPriceController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: 'Product Price',
             ),
             keyboardType: TextInputType.number,
           ),
           TextField(
             controller: vehicleNumberController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: 'Vehicle Number',
             ),
           ),
@@ -174,8 +178,8 @@ class _AddProductPageState extends State<AddProductPage> {
               Navigator.pop(context, true);
             },
             child: isLoading
-                ? CircularProgressIndicator()
-                : Text('Add Product'),
+                ? const CircularProgressIndicator()
+                : const Text('Add Product'),
           ),
         ],
       ),

@@ -1,4 +1,6 @@
 // CartScreen.dart
+// ignore_for_file: library_private_types_in_public_api, file_names, unnecessary_string_escapes
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'renting.dart'; // Import the Renting class
 
 class CartScreen extends StatefulWidget {
+  const CartScreen({super.key});
+
   @override
   _CartScreenState createState() => _CartScreenState();
 }
@@ -38,10 +42,10 @@ class _CartScreenState extends State<CartScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Cart'),
+        title: const Text('Cart'),
       ),
       body: cartItems!.isEmpty
-          ? Center(
+          ? const Center(
         child: Text('Your cart is empty.'),
       )
           : ListView.builder(

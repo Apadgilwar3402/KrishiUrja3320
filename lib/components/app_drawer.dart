@@ -101,7 +101,7 @@ class AppDrawer extends StatelessWidget {
               // Navigate to the weather forecast module
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => scheme() ),);
+                MaterialPageRoute(builder: (context) => const scheme() ),);
             },
           ),
           ListTile(

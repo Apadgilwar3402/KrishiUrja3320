@@ -8,7 +8,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp( options: DefaultFirebaseOptions.currentPlatform, );
 
-runApp(MyApp());
+runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -20,9 +20,9 @@ Widget build(BuildContext context) {
     debugShowCheckedModeBanner: false,
     title: 'My App',
     theme: ThemeData( primarySwatch: Colors.blue, ),
-    home: Welcome(),
+    home: const Welcome(),
     routes: {
-      '/menu': (context) => menu(),
+      '/menu': (context) => const menu(),
     },
   );
 }

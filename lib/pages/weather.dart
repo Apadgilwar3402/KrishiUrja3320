@@ -1,3 +1,5 @@
+// ignore_for_file: camel_case_types, avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:modernlogintute/models/weather_model.dart';
 import 'package:modernlogintute/services/weather_service.dart';

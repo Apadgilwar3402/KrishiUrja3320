@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import, library_private_types_in_public_api, unused_local_variable, file_names, use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,6 +9,8 @@ import 'package:modernlogintute/pages/menu.dart';
 import 'admin_Console.dart';
 
 class AdminLoginPage extends StatefulWidget {
+  const AdminLoginPage({super.key});
+
   @override
   _AdminLoginPageState createState() => _AdminLoginPageState();
 }
@@ -20,7 +24,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Admin Login'),
+        title: const Text('Admin Login'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -30,7 +34,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
             children: <Widget>[
               TextFormField(
                 controller: _emailController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Email',
                 ),
                 validator: (value) {
@@ -42,7 +46,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
               ),
               TextFormField(
                 controller: _passwordController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Password',
                 ),
                 obscureText: true,
@@ -81,7 +85,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                           // Uncomment and modify if you want to redirect to a specific page:
                           Navigator.of(context).pushReplacement(
                             MaterialPageRoute(
-                              builder: (BuildContext context) => AdminConsole(),
+                              builder: (BuildContext context) => const AdminConsole(),
                             ),
                           );
                         } else {
@@ -110,7 +114,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                   }
                 }
                 },
-                child: Text('Login'),
+                child: const Text('Login'),
               ),
             ],
           ),

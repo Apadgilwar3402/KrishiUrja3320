@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable, use_key_in_widget_constructors, library_private_types_in_public_api, use_build_context_synchronously, unnecessary_string_escapes
+
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -181,8 +183,8 @@ class _RentingState extends State<Renting> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: Icon(Icons.add_shopping_cart),
-              title: Text('Add to Cart'),
+              leading: const Icon(Icons.add_shopping_cart),
+              title: const Text('Add to Cart'),
               onTap: () async {
                 final userId = _auth.currentUser!.uid;
                 final cartDoc = _firestore.collection('carts').doc(userId);
@@ -200,8 +202,8 @@ class _RentingState extends State<Renting> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.favorite_border),
-              title: Text('Add to Wishlist'),
+              leading: const Icon(Icons.favorite_border),
+              title: const Text('Add to Wishlist'),
               onTap: () async {
                 final userId = _auth.currentUser!.uid;
                 final wishlistDoc = _firestore.collection('wishlists').doc(userId);
@@ -228,13 +230,13 @@ class _RentingState extends State<Renting> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Product List'),
+        title: const Text('Product List'),
         actions: [
           IconButton(
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => _isAddingProduct ? Renting() : AddProductPage()),
+                MaterialPageRoute(builder: (context) => _isAddingProduct ? Renting() : const AddProductPage()),
               );
             },
             icon: Icon(_isAddingProduct ? Icons.close : Icons.add),
@@ -247,17 +249,17 @@ class _RentingState extends State<Renting> {
                 ),
               );
             },
-            icon: Icon(Icons.favorite_border),
+            icon: const Icon(Icons.favorite_border),
           ),
           IconButton(
             onPressed: () {
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(
-                  builder: (BuildContext context) => CartScreen(),
+                  builder: (BuildContext context) => const CartScreen(),
                 ),
               );
             },
-            icon: Icon(Icons.shopping_cart),
+            icon: const Icon(Icons.shopping_cart),
           ),
         ],
       ),
@@ -265,11 +267,11 @@ class _RentingState extends State<Renting> {
           ? Column(
         children: [
           Container(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                const Text(
                   'Add Product',
                   style: TextStyle(
                     fontSize: 24,
@@ -282,7 +284,7 @@ class _RentingState extends State<Renting> {
                       _isAddingProduct = false;
                     });
                   },
-                  icon: Icon(Icons.close),
+                  icon: const Icon(Icons.close),
                 ),
               ],
             ),
@@ -303,17 +305,17 @@ class _RentingState extends State<Renting> {
                             });
                           }
                         },
-                        icon: Icon(Icons.camera_alt),
+                        icon: const Icon(Icons.camera_alt),
                       ),
                       title: TextField(
                         controller: productNameController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'Product Name',
                         ),
                       ),
                       subtitle: TextField(
                         controller: productDescriptionController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'Product Description',
                         ),
                       ),
@@ -322,14 +324,14 @@ class _RentingState extends State<Renting> {
                         children: [
                           TextField(
                             controller: productPriceController,
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               labelText: 'Product Price',
                             ),
                             keyboardType: TextInputType.number,
                           ),
                           TextField(
                             controller: vehicleNumberController,
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               labelText: 'Vehicle Number',
                             ),
                           ),
@@ -338,7 +340,7 @@ class _RentingState extends State<Renting> {
                     ),
                     ElevatedButton(
                       onPressed: addProduct,
-                      child: Text('Add Product'),
+                      child: const Text('Add Product'),
                     ),
                   ],
                 );

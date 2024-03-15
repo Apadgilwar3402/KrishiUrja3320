@@ -1,3 +1,5 @@
+// ignore_for_file: body_might_complete_normally_nullable, use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';

@@ -47,7 +47,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
               Navigator.push(
                   context,
                   MaterialPageRoute
-                    (builder: (context) =>  AdminLoginPage(),));
+                    (builder: (context) =>  const AdminLoginPage(),));
             },
             style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.lightGreen,

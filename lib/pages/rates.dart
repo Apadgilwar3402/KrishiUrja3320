@@ -5,7 +5,7 @@ import '../components/app_drawer.dart';
 
 class RatesPage extends StatelessWidget {
   final User user;
-  const RatesPage({required this.user});
+  const RatesPage({super.key, required this.user});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,7 +16,7 @@ class RatesPage extends StatelessWidget {
         stream: FirebaseFirestore.instance.collection('Rates').snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
           final documents = snapshot.data!.docs;
           return ListView.builder(

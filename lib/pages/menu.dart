@@ -1,3 +1,5 @@
+// ignore_for_file: camel_case_types, library_private_types_in_public_api, use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:modernlogintute/pages/scheme.dart';
@@ -79,7 +81,7 @@ class _menuState extends State<menu> {
                 child: GestureDetector(
                   onTap: () {Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
-                      builder: (BuildContext context) => weather(),
+                      builder: (BuildContext context) => const weather(),
                     ),
                   );
                   },
@@ -124,7 +126,7 @@ class _menuState extends State<menu> {
                 child: GestureDetector(
                   onTap: () {Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
-                      builder: (BuildContext context) => scheme(),
+                      builder: (BuildContext context) => const scheme(),
                     ),
                   );
                   },
