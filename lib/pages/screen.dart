@@ -1,7 +1,8 @@
 // screens page
 import 'package:flutter/material.dart';
-import 'Login.dart';
+import 'Admin_Login.dart';
 import 'auth_page.dart';
+import 'broker_login.dart';
 
 
 void main() => runApp(const Screen());
@@ -47,7 +48,19 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
               Navigator.push(
                   context,
                   MaterialPageRoute
-                    (builder: (context) =>  const AdminLoginPage(),));
+                    (builder: (context) =>  BrokerLoginPage(),));
+            },
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.lightGreen,
+                padding: const EdgeInsets.fromLTRB(55, 30, 55, 30)),
+            child: const Text('Broker Login'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute
+                    (builder: (context) =>  AdminLoginPage(),));
             },
             style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.lightGreen,

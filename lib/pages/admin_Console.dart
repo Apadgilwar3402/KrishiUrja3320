@@ -2,6 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:modernlogintute/pages/rates_console.dart';
+
+import '../components/admin_drawer.dart';
+import 'AdminProductConsole.dart';
+import 'auth_Service.dart';
 
 class AdminConsole extends StatefulWidget {
   const AdminConsole({super.key});
@@ -89,6 +94,22 @@ class _AdminConsoleState extends State<AdminConsole> {
                   color: Colors.lightGreen,
                 ),
                 child: Text('Admin Console'),
+              ),
+              ListTile(
+                title: const Text('Product Console'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AdminProductScreen ()));
+                },
+              ),
+              ListTile(
+                title: const Text('Rates Console'),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => RateConsole ()));
+                },
               ),
               ListTile(
                 title: const Text('Logout'),
@@ -251,5 +272,32 @@ class _AdminConsoleState extends State<AdminConsole> {
     ),
     ),
     );
+  }
+}
+
+Widget _buildAdminDrawer() {
+  // Check if user is an admin before providing access to AdminDrawer
+  final currentUser = auth.currentUser;
+  if (currentUser != null) {
+    return FutureBuilder(
+      future: FirebaseFirestore.instance.collection('admins').doc(currentUser.uid).get(),
+      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+        if (snapshot.hasError) {
+          return const Text('Something went wrong');
+        }
+
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.data!.exists) {
+            return AppDrawer(user: currentUser);
+          } else {
+            return const SizedBox(); // Empty widget placeholder when user is not an admin
+          }
+        }
+
+        return const CircularProgressIndicator();
+      },
+    );
+  } else {
+    return const SizedBox(); // Empty widget placeholder when user is not signed in
   }
 }

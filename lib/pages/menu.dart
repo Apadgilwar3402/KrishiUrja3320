@@ -59,7 +59,7 @@ class _menuState extends State<menu> {
                 child: GestureDetector(
                   onTap: () {Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
-                      builder: (BuildContext context) => Renting(),
+                      builder: (BuildContext context) => Renting(selectedProducts: [],),
                     ),
                   );
                   },
@@ -73,7 +73,7 @@ class _menuState extends State<menu> {
                   color: Colors.grey[350],
                   borderRadius: BorderRadius.circular(16.0),
                   image: const DecorationImage(
-                    image: AssetImage('lib/images/weather.jpg'),
+                    image: AssetImage('lib/images/weather.jpeg'),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -81,7 +81,7 @@ class _menuState extends State<menu> {
                 child: GestureDetector(
                   onTap: () {Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
-                      builder: (BuildContext context) => const weather(),
+                      builder: (BuildContext context) => const WeatherScreen(),
                     ),
                   );
                   },

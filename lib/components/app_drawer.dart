@@ -4,6 +4,7 @@ import 'package:modernlogintute/pages/renting.dart';
 import 'package:modernlogintute/pages/weather.dart';
 import '../pages/rates.dart';
 import '../pages/scheme.dart';
+import '../screens/rent_request_list_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   final User user;
@@ -70,7 +71,16 @@ class AppDrawer extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => Renting() ),);
+                MaterialPageRoute(builder: (context) => Renting(selectedProducts: [],) ),);
+            },
+          ),
+          ListTile(
+            title: const Text('order'),
+            leading: const Icon(Icons.agriculture),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => RentRequestListScreen() ),);
             },
           ),
           ListTile(
@@ -80,7 +90,7 @@ class AppDrawer extends StatelessWidget {
               // Navigate to the weather forecast module
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const weather() ),);
+                MaterialPageRoute(builder: (context) => const WeatherScreen() ),);
             },
           ),
           ListTile(
