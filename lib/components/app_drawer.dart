@@ -2,9 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modernlogintute/pages/renting.dart';
 import 'package:modernlogintute/pages/weather.dart';
+import '../pages/order.dart';
 import '../pages/rates.dart';
 import '../pages/scheme.dart';
-import '../screens/rent_request_list_screen.dart';
+
 
 class AppDrawer extends StatelessWidget {
   final User user;
@@ -71,7 +72,7 @@ class AppDrawer extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => Renting(selectedProducts: [],) ),);
+                MaterialPageRoute(builder: (context) => Renting() ),);
             },
           ),
           ListTile(
@@ -80,7 +81,7 @@ class AppDrawer extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => RentRequestListScreen() ),);
+                MaterialPageRoute(builder: (context) => UserOrdersScreen(userId: '',) ),);
             },
           ),
           ListTile(

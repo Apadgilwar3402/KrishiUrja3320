@@ -10,7 +10,7 @@ void main() => runApp(const Screen());
 class Screen extends StatelessWidget {
   const Screen({super.key});
 
-  //static const String _title = 'KrishiUrja';
+  static const String _title = 'KrishiUrja';
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,6 @@ class MyStatefulWidget extends StatefulWidget {
 }
 
 class _MyStatefulWidgetState extends State<MyStatefulWidget> {
-  //get onTap => AdminLoginPage(onTap: () {  },);
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +54,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                 padding: const EdgeInsets.fromLTRB(55, 30, 55, 30)),
             child: const Text('Broker Login'),
           ),
+          const SizedBox(height: 30),
           ElevatedButton(
             onPressed: () {
               Navigator.push(

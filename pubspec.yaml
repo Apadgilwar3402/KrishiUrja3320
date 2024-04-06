@@ -53,6 +53,7 @@ dependencies:
   firebase_auth: ^4.17.8
   provider: ^6.1.2
   url_launcher: ^6.0.19
+  mailer: ^6.0.0
 
 
 

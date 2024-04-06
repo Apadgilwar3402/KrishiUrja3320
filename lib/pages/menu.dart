@@ -59,7 +59,7 @@ class _menuState extends State<menu> {
                 child: GestureDetector(
                   onTap: () {Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
-                      builder: (BuildContext context) => Renting(selectedProducts: [],),
+                      builder: (BuildContext context) => Renting(),
                     ),
                   );
                   },

@@ -1,33 +1,11 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'broker_console.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Broker Login',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const BrokerLoginPage(),
-    );
-  }
-}
-
 class BrokerLoginPage extends StatefulWidget {
-  const BrokerLoginPage({Key? key}) : super(key: key);
+  const BrokerLoginPage({super.key});
 
   @override
   _BrokerLoginPageState createState() => _BrokerLoginPageState();
@@ -85,11 +63,11 @@ class _BrokerLoginPageState extends State<BrokerLoginPage> {
                         password: _passwordController.text,
                       );
 
-                      // Check if the user's email exists in the 'brokers' collection
-                      final brokers = FirebaseFirestore.instance.collection('brokers');
-                      final brokerSnapshot = await brokers.where('email', isEqualTo: _emailController.text).get();
+                      // Check if the user's email exists in the 'brokerUsers' collection
+                      final brokerUsers = FirebaseFirestore.instance.collection('brokerUsers');
+                      final brokerUserSnapshot = await brokerUsers.where('email', isEqualTo: _emailController.text).get();
 
-                      if (brokerSnapshot.docs.isNotEmpty) {
+                      if (brokerUserSnapshot.docs.isNotEmpty) {
                         // Check if the user's email is verified
                         final user = FirebaseAuth.instance.currentUser;
 
@@ -101,27 +79,30 @@ class _BrokerLoginPageState extends State<BrokerLoginPage> {
                             ),
                           );
                           // Uncomment and modify if you want to redirect to a specific page:
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(
-                              builder: (BuildContext context) => const AddProductPage(currentUserId: '',),
-                            ),
-                          );
+                          final User? user = FirebaseAuth.instance.currentUser;
+
+                          if (user != null) {
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                builder: (BuildContext context) => AddProductPage(),
+                              ),
+                            );
+                          }
                         } else {
                           // Show email verification error message
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content:Text('Email address not verified. Please verify your email to continue.'),
+                              content: Text('Email address not verified. Please verify your email to continue.'),
                             ),
                           );
                         }
                       } else {
-                        // Show broker authorization error message
+                        // Show user authorization error message
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Invalid broker credentials'),
                           ),
-                        );
-                      }
+                        );}
                     } catch (error) {
                       // Show general error message
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -137,22 +118,6 @@ class _BrokerLoginPageState extends State<BrokerLoginPage> {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class BrokerConsole extends StatelessWidget {
-  const BrokerConsole({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Broker Console'),
-      ),
-      body: const Center(
-        child: Text('Welcome to the Broker Console!'),
       ),
     );
   }
