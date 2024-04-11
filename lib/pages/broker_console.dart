@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
-
 import 'RentRequestsScreen.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -14,67 +13,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser!;
-
     return AppBar(
-      title: Text('Add Product'),
-      actions: [
-        IconButton(
-          icon: Icon(Icons.logout),
-          onPressed: () async {
-            await FirebaseAuth.instance.signOut();
-            Navigator.pushNamedAndRemoveUntil(
-              context,
-              '/login',
-              (route) => false,
-            );
-          },
-        ),
-      ],
-      bottom: PreferredSize(
-        preferredSize: Size.fromHeight(80.0),
-        child: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              UserAccountsDrawerHeader(
-                accountName: Text(user.displayName ?? ''),
-                accountEmail: Text(user.email ?? ''),
-                currentAccountPicture: CircleAvatar(
-                  backgroundColor: Colors.white,
-                  child: Text(
-                    user.email!.substring(0, 1).toUpperCase(),
-                    style: TextStyle(fontSize: 24.0),
-                  ),
-                ),
-              ),
-              ListTile(
-                title: const Text('Rent Request'),
-                leading: const Icon(Icons.file_copy),
-                onTap: () {
-                  // Navigate to the weather forecast module
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RentRequestsScreen() ),);
-                },
-              ),
-              ListTile(
-                title: Text('Logout'),
-                onTap: () async {
-                  await FirebaseAuth.instance.signOut();
-                  Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    '/login',
-                    (route) => false,
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+        title: Text('Add Product'),
+  );}}
+// Import the ProductList widget
 
 class AddProductPage extends StatefulWidget {
   @override
@@ -86,14 +28,12 @@ class _AddProductPageState extends State<AddProductPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final _auth = FirebaseAuth.instance;
-  List<Product> products = [];
 
   final productNameController = TextEditingController();
   final productDescriptionController = TextEditingController();
   File? pickedImage;
   final productPriceController = TextEditingController();
   final vehicleNumberController = TextEditingController();
-  String? brokerMailId; // Add brokerMailId field
 
   Future<File?> pickImage(ImageSource source) async {
     final pickedFile = await ImagePicker().pickImage(source: source);
@@ -145,7 +85,7 @@ class _AddProductPageState extends State<AddProductPage> {
       'price': double.parse(productPriceController.text),
       'imageUrl': imageUrl,
       'vehicleNumber': vehicleNumber,
-      'brokerMailId': brokerMailId, // Add brokerMailId field
+      'brokerMailId': _auth.currentUser!.email, // Set the brokerMailId to the current user's email
     });
 
     productNameController.clear();
@@ -157,12 +97,63 @@ class _AddProductPageState extends State<AddProductPage> {
       _isAddingProduct = false;
     });
 
-    // fetchProducts();
+    //fetchProducts();
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            UserAccountsDrawerHeader(
+              accountName: Text(FirebaseAuth.instance.currentUser!.displayName ?? ''),
+              accountEmail: Text(FirebaseAuth.instance.currentUser!.email ?? ''),
+              currentAccountPicture: CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Text(
+                  FirebaseAuth.instance.currentUser!.email!.substring(0, 1).toUpperCase(),
+                  style: TextStyle(fontSize: 24.0),
+                ),
+              ),
+            ),
+            ListTile(
+              title: const Text('Rent Request'),
+              leading: const Icon(Icons.file_copy),
+              onTap: () {
+                // Navigate to the weather forecast module
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => RentRequestsScreen()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Products'),
+              onTap: () {
+                // Navigate to the ProductList widget
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProductList()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Logout'),
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/login',
+                      (route) => false,
+                );
+              },
+            ),
+          ],
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -177,8 +168,7 @@ class _AddProductPageState extends State<AddProductPage> {
                     ),
                     TextField(
                       controller: productDescriptionController,
-                      decoration:
-                          InputDecoration(labelText: 'Product Description'),
+                      decoration: InputDecoration(labelText: 'Product Description'),
                     ),
                     TextField(
                       controller: productPriceController,
@@ -190,7 +180,7 @@ class _AddProductPageState extends State<AddProductPage> {
                       decoration: InputDecoration(labelText: 'Vehicle Number'),
                     ),
                     TextField(
-                      controller: TextEditingController(text: brokerMailId),
+                      controller: TextEditingController(text: _auth.currentUser!.email), // Set the controller to the current user's email
                       decoration: InputDecoration(labelText: 'Broker Mail Id'),
                     ),
                     ElevatedButton(
@@ -246,6 +236,66 @@ class Product {
       imageUrl: doc['imageUrl'],
       vehicleNumber: doc['vehicleNumber'],
       brokerMailId: doc['brokerMailId'],
+    );
+  }
+}
+
+// ProductList widget definition here
+class ProductList extends StatefulWidget {
+  @override
+  _ProductListState createState() => _ProductListState();
+}
+
+class _ProductListState extends State<ProductList> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final _auth = FirebaseAuth.instance;
+
+  List<Product> products = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchProducts();
+  }
+
+  Future<void> fetchProducts() async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      final QuerySnapshot querySnapshot = await _firestore
+          .collection('products')
+          .where('brokerMailId', isEqualTo: user.email)
+          .get();
+
+      final List<Product> fetchedProducts = querySnapshot.docs
+          .map((doc) => Product.fromDocument(doc))
+          .toList();
+
+      setState(() {
+        products = fetchedProducts;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('My Products')),
+      body: products.isEmpty
+          ? Center(
+        child: Text('No products found.'),
+      )
+          : ListView.builder(
+        itemCount: products.length,
+        itemBuilder: (context, index) {
+          final product = products[index];
+          return ListTile(
+            leading: Image.network(product.imageUrl),
+            title: Text(product.name),
+            subtitle: Text(product.vehicleNumber),
+            trailing: Text('\$${product.price.toStringAsFixed(2)}'),
+          );
+        },
+      ),
     );
   }
 }

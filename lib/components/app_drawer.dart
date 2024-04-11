@@ -5,7 +5,7 @@ import 'package:modernlogintute/pages/weather.dart';
 import '../pages/order.dart';
 import '../pages/rates.dart';
 import '../pages/scheme.dart';
-
+import '../pages/Profile.dart';
 
 class AppDrawer extends StatelessWidget {
   final User user;
@@ -36,18 +36,18 @@ class AppDrawer extends StatelessWidget {
                   backgroundColor: Colors.white,
                   child: photoUrl.isNotEmpty
                       ? ClipOval(
-                    child: Image.network(
-                      photoUrl,
-                      width: 60,
-                      height: 60,
-                      fit: BoxFit.cover,
-                    ),
-                  )
+                          child: Image.network(
+                            photoUrl,
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                          ),
+                        )
                       : const Icon(
-                    Icons.person,
-                    color: Colors.green,
-                    size: 30,
-                  ),
+                          Icons.person,
+                          color: Colors.green,
+                          size: 30,
+                        ),
                 ),
                 const SizedBox(height: 10),
                 const Text(
@@ -72,7 +72,8 @@ class AppDrawer extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => Renting() ),);
+                MaterialPageRoute(builder: (context) => Renting()),
+              );
             },
           ),
           ListTile(
@@ -81,7 +82,11 @@ class AppDrawer extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => UserOrdersScreen(userId: '',) ),);
+                MaterialPageRoute(
+                    builder: (context) => UserOrdersScreen(
+                          userId: '',
+                        )),
+              );
             },
           ),
           ListTile(
@@ -91,7 +96,8 @@ class AppDrawer extends StatelessWidget {
               // Navigate to the weather forecast module
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const WeatherScreen() ),);
+                MaterialPageRoute(builder: (context) => const WeatherScreen()),
+              );
             },
           ),
           ListTile(
@@ -112,7 +118,19 @@ class AppDrawer extends StatelessWidget {
               // Navigate to the weather forecast module
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const scheme() ),);
+                MaterialPageRoute(builder: (context) => const scheme()),
+              );
+            },
+          ),
+          ListTile(
+            title: const Text('Profile'),
+            leading: const Icon(Icons.man),
+            onTap: () {
+              // Navigate to the weather forecast module
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfileScreen()),
+              );
             },
           ),
           ListTile(

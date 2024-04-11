@@ -128,13 +128,13 @@ class _RentingScreenState extends State<RentingScreen> {
     if (brokerEmail!= null) {
       final productNames = await _getProductNames(productIds);
       final message = Message()
-        ..from = Address('your_email@gmail.com')
+        ..from = Address('KrishiUrja3320@gmail.com')
         ..recipients.add(brokerEmail)
         ..subject = 'New Rent Request'
         ..text =
             'Rent Request from $renterName ($renterEmail)\n\nAddress: $renterAddress\n\nProducts:\n${productNames.join('\n')}';
 
-      final smtpServer = gmail('your_email@gmail.com', 'your_app_password');
+      final smtpServer = gmail('KrishiUrja3320@gmail.com', 'Aks@3320');
 
       try {
         await send(message, smtpServer);
@@ -161,11 +161,12 @@ class _RentingScreenState extends State<RentingScreen> {
   }
 
   Future<List> _getProductNames(List<String> productIds) async {
-    final products = await Future.wait(
-      productIds.map((id) =>
-          FirebaseFirestore.instance.collection('products').doc(id).get()),
-    );
-    return products.map((doc) => doc.data()?['name'] ?? 'Unknown').toList();
+    final products = await FirebaseFirestore.instance
+        .collection('products')
+        .where(FieldPath.documentId, whereIn: productIds)
+        .get();
+
+    return products.docs.map((doc) => doc.data()['name']).toList();
   }
 
   Future<String?> _getBrokerEmail(String productId) async {
@@ -175,7 +176,7 @@ class _RentingScreenState extends State<RentingScreen> {
 
     if (productDoc.exists) {
       final productData = productDoc.data();
-      if (productData != null && productData['brokerMailId'] != null) {
+      if (productData!= null && productData['brokerMailId']!= null) {
         final brokerRef = FirebaseFirestore.instance
             .collection('brokerUsers')
             .doc(productData['brokerMailId']);
@@ -183,7 +184,7 @@ class _RentingScreenState extends State<RentingScreen> {
 
         if (brokerDoc.exists) {
           final brokerData = brokerDoc.data();
-          if (brokerData != null && brokerData['email'] != null) {
+          if (brokerData!= null && brokerData['email']!= null) {
             return brokerData['email'];
           }
         }
