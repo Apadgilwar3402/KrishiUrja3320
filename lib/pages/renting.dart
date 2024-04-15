@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -39,7 +38,7 @@ class Product {
     required this.description,
     required this.price,
     required this.imageUrl,
-    required this.vehicleNumber,
+    required this.vehicleNumber, required brokerId, required brokerEmail, required brokerMailId,
   });
 
   factory Product.fromDocument(DocumentSnapshot doc) {
@@ -51,6 +50,8 @@ class Product {
       price: data['price'],
       imageUrl: data['imageUrl'],
       vehicleNumber: data['vehicleNumber'],
+      brokerId: data['brokerId'],
+      brokerEmail: data['brokerMailId'], brokerMailId: data['brokerMailId'],
     );
   }
 }
@@ -122,14 +123,22 @@ class _RentingState extends State<Renting> {
                 final cartDoc = _firestore.collection('carts').doc(userId);
                 final cartData = (await cartDoc.get()).data();
                 final itemIds = cartData?['itemIds'] ?? [];
-                itemIds.add(product.id);
-                await cartDoc.set({'itemIds': itemIds});
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Product added to Cart.'),
-                  ),
-                );
-                fetchCartAndWishlistItems();
+                if (!itemIds.contains(product.id)) {
+                  itemIds.add(product.id);
+                  await cartDoc.set({'itemIds': itemIds});
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Product added to Cart.'),
+                    ),
+                  );
+                  fetchCartAndWishlistItems();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Product already in Cart.'),
+                    ),
+                  );
+                }
                 Navigator.pop(context);
               },
             ),
@@ -141,14 +150,22 @@ class _RentingState extends State<Renting> {
                 final wishlistDoc = _firestore.collection('wishlists').doc(userId);
                 final wishlistData = (await wishlistDoc.get()).data();
                 final itemIds = wishlistData?['itemIds'] ?? [];
-                itemIds.add(product.id);
-                await wishlistDoc.set({'itemIds': itemIds});
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Product added to Wishlist.'),
-                  ),
-                );
-                fetchCartAndWishlistItems();
+                if (!itemIds.contains(product.id)) {
+                  itemIds.add(product.id);
+                  await wishlistDoc.set({'itemIds': itemIds});
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Product added to Wishlist.'),
+                    ),
+                  );
+                  fetchCartAndWishlistItems();
+                }  else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Product already in Wishlist.'),
+                    ),
+                  );
+                }
                 Navigator.pop(context);
               },
             ),

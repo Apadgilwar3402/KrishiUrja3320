@@ -107,7 +107,7 @@ class _CartScreenState extends State<CartScreen> {
         MaterialPageRoute(
           builder: (context) => RentingScreen(
             selectedProducts: selectedProducts!,
-            userData: userData,
+            userData: userData, productIds: [],
           ),
         ),
       );

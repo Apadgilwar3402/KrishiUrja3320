@@ -1,7 +1,31 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'RentingScreen.dart';
 import 'renting.dart';
+
+class Product {
+  final String id;
+  final String brokerId;
+  final String? brokerMailId;
+  final String description;
+  final String imageUrl;
+  final String name;
+  final int price;
+  final String vehicleNumber;
+
+  Product({
+    required this.id,
+    required this.brokerId,
+    this.brokerMailId,
+    required this.description,
+    required this.imageUrl,
+    required this.name,
+    required this.price,
+    required this.vehicleNumber,
+  });
+}
 
 class RentRequestsScreen extends StatefulWidget {
   @override
@@ -9,7 +33,7 @@ class RentRequestsScreen extends StatefulWidget {
 }
 
 class _RentRequestsScreenState extends State<RentRequestsScreen> {
-  Stream<QuerySnapshot>? _rentRequestsStream;
+  Stream<List<RentRequest>>? _rentRequestsStream;
   bool _isBroker = false;
 
   @override
@@ -20,26 +44,66 @@ class _RentRequestsScreenState extends State<RentRequestsScreen> {
   }
 
   void _checkIfBroker() async {
-    final userId = FirebaseAuth.instance.currentUser!.uid;
-    final userDoc = await FirebaseFirestore.instance.collection('brokerUsers').doc(userId).get();
-    setState(() {
-      _isBroker = userDoc.data()?['isBroker']?? false;
-    });
+    final User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      print('User is signed in: ${user.uid}');
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('brokerUsers')
+          .where('email', isEqualTo: user.email)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        final brokerData = querySnapshot.docs.first.data();
+        setState(() {
+          _isBroker = brokerData['isBroker'] ?? false;
+          print('Is broker: $_isBroker');
+        });
+      } else {
+        setState(() {
+          _isBroker = false;
+          print('Is broker: $_isBroker');
+        });
+      }
+    } else {
+      print('User is not signed in');
+    }
   }
 
   void _loadRentRequests() {
-    final userId = FirebaseAuth.instance.currentUser!.uid;
-    _rentRequestsStream = FirebaseFirestore.instance
-        .collectionGroup('rentRequests')
-        .where('productIds', arrayContainsAny: [userId])
-        .snapshots();
+    final User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      _rentRequestsStream = FirebaseFirestore.instance
+          .collection('users/${user.uid}/rentRequests')
+          .snapshots()
+          .map((querySnapshot) {
+        return querySnapshot.docs.map((doc) {
+          final data = doc.data();
+          final productIds = List<String>.from(data['productIds'] ?? []);
+          return RentRequest(
+            id: doc.id,
+            renterId: data['renterId'] ?? '',
+            renterName: data['renterName'] ?? '',
+            renterEmail: data['renterEmail'] ?? '',
+            renterAddress: data['renterAddress'] ?? '',
+            productIds: productIds,
+            timestamp: data['timestamp'] ?? Timestamp.now(),
+          );
+        }).toList();
+      });
+    } else {
+      print('User is not signed in');
+    }
   }
 
-  void _showProducts(List<String> productIds) {
+  void _showProducts(RentRequest rentRequest, Function(String) updatebrokerMailId) {
+    rentRequest.fetchbrokerMailId(updatebrokerMailId);
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => RentingScreen(productIds: productIds),
+        builder: (context) => RentingScreen(
+          productIds: rentRequest.productIds,
+          selectedProducts: [],
+        ),
       ),
     );
   }
@@ -51,110 +115,113 @@ class _RentRequestsScreenState extends State<RentRequestsScreen> {
         title: Text('Rent Requests'),
       ),
       body: _isBroker
-          ? StreamBuilder<QuerySnapshot>(
+          ? StreamBuilder<List<RentRequest>>(
         stream: _rentRequestsStream,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
+            return Text('Error: ${snapshot.error}');
           }
 
-          if (!snapshot.hasData) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator();
           }
 
-          final rentRequests = snapshot.data!.docs;
-          if (rentRequests.isEmpty) {
-            return Center(
-              child: Text('No rent requests yet.'),
-            );
-          }
+          final rentRequests = snapshot.data!;
 
           return ListView.builder(
             itemCount: rentRequests.length,
             itemBuilder: (context, index) {
-              final rentRequest = rentRequests[index].data() as Map<String, dynamic>;
-              final renterName = rentRequest['renterName'];
-              final renterEmail = rentRequest['renterEmail'];
-              final renterAddress = rentRequest['renterAddress'];
-              final productIds = List<String>.from(rentRequest['productIds']);
+              final rentRequest = rentRequests[index];
+              final productId = rentRequest.productIds.first;
 
-              return ListTile(
-                title: Text('$renterName ($renterEmail)'),
-                subtitle: Text('Address: $renterAddress'),
-                trailing: Text('Products: ${productIds.length}'),
-                onTap: () {
-                  _showProducts(productIds);
+              return FutureBuilder<Product>(
+                future: _loadProduct(productId),
+                builder: (context, productSnapshot) {
+                  if (productSnapshot.hasError) {
+                    return Text('Error: ${productSnapshot.error}');
+                  }
+
+                  if (productSnapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+
+                  final product = productSnapshot.data!;
+
+                  return ListTile(
+                    leading: Image.network(product.imageUrl),
+                    title: Text(product.name),
+                    subtitle: Text('${product.brokerMailId}\n${rentRequest.renterName} - ${rentRequest.renterEmail}\n${rentRequest.renterAddress}'),
+                    trailing: Text(rentRequest.timestamp.toDate().toString()),
+                    onTap: () {
+                      _showProducts(rentRequest, (brokerMailId) {
+                        // Handle the broker email here
+                      });
+                    },
+                  );
                 },
               );
             },
           );
         },
-      )
-          : Center(
+      ):
+      Center(
         child: Text('You are not a broker.'),
       ),
     );
   }
+
+  Future<Product> _loadProduct(String productId) async {
+    final doc = await FirebaseFirestore.instance.collection('products').doc(productId).get();
+    final data = doc.data()!;
+    final brokerId = data['brokerId'];
+    final broker = await FirebaseFirestore.instance.collection('brokerUsers').doc(brokerId).get();
+    final brokerData = broker.data();
+    final imageUrl = data['imageUrl'];
+    final name = data['name'];
+    final description = data['description'];
+    final price = data['price'];
+    final vehicleNumber = data['vehicleNumber'];
+
+    return Product(
+      id: doc.id,
+      brokerId: brokerId,
+      brokerMailId: brokerData?['brokerMailId'],
+      description: description,
+      imageUrl: imageUrl,
+      name: name,
+      price: price,
+      vehicleNumber: vehicleNumber,
+    );
+  }
 }
 
-class RentingScreen extends StatefulWidget {
+class RentRequest {
+  final String id;
+  final String renterId;
+  final String renterName;
+  final String renterEmail;
+  final String renterAddress;
   final List<String> productIds;
+  final Timestamp timestamp;
+  String? brokerMailId;
 
-  const RentingScreen({required this.productIds});
+  RentRequest({
+    required this.id,
+    required this.renterId,
+    required this.renterName,
+    required this.renterEmail,
+    required this.renterAddress,
+    required this.productIds,
+    required this.timestamp,
+  });
 
-  @override
-  _RentingScreenState createState() => _RentingScreenState();
-}
-
-class _RentingScreenState extends State<RentingScreen> {
-  late Future<List<Product>> _productsFuture;
-
-  @override
-  void initState() {
-    _productsFuture = _fetchProducts();
-    super.initState();
-  }
-
-  Future<List<Product>> _fetchProducts() async {
-    final products = await Future.wait(
-      widget.productIds.map((id) =>
-          FirebaseFirestore.instance.collection('products').doc(id).get()),
-    );
-    return products.map((doc) => Product.fromDocument(doc)).toList();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Selected Products'),
-      ),
-      body: FutureBuilder<List<Product>>(
-        future: _productsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                final product = snapshot.data![index];
-                return ListTile(
-                  title: Text(product.name),
-                  subtitle: Text(product.description),
-                  leading: Image.network(product.imageUrl),
-                );
-              },
-            );
-          } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          } else {
-            return CircularProgressIndicator();
-          }
-        },
-      ),
-    );
+  void fetchbrokerMailId(Function(String) updatebrokerMailId) async {
+    final productDocs = await FirebaseFirestore.instance.collection('products').where('productId', whereIn: productIds).get();
+    final productData = productDocs.docs.first.data();
+    final brokerId = productData['brokerId'];
+    final broker = await FirebaseFirestore.instance.collection('brokerUsers').doc(brokerId).get();
+    final brokerData = broker.data();
+    updatebrokerMailId(brokerData?['brokerMailId'] ?? '');
+    this.brokerMailId = brokerData?['brokerMailId'] ?? '';
   }
 }

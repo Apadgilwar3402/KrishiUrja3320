@@ -74,13 +74,19 @@ class _LoginOrRegisterPageState extends State<LoginOrRegisterPage> {
   Future<void> _createUserDocument() async {
     final user = FirebaseAuth.instance.currentUser;
     final userDocRef = FirebaseFirestore.instance.collection('users').doc(user!.uid);
-    await userDocRef.set({
-      'name': user.displayName,
-      'email': user.email,
-      'photoURL': user.photoURL,
-      'uid': user.uid,
-      'createdAt': FieldValue.serverTimestamp(),
-    });
+
+    // Check if the user document already exists
+    final documentSnapshot = await userDocRef.get();
+    if (!documentSnapshot.exists) {
+      // Create a new user document if it doesn't exist
+      await userDocRef.set({
+        'name': user.displayName,
+        'email': user.email,
+        'photoURL': user.photoURL,
+        'uid': user.uid,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    }
   }
 
   // Registration form fields and logic (replace with your implementation)

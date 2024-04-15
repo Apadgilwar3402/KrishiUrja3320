@@ -75,8 +75,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             'email': _emailController.text,
             'address': _addressController.text,
             'mobile_number': _mobileNumberController.text,
-            if (_profilePictureUrl!= null) 'profile_picture_url': _profilePictureUrl,
           });
+
+          if (_profilePictureUrl != null) {
+            await userDoc.update({
+              'profile_picture_url': _profilePictureUrl,
+            });
+          }
+
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Profile updated successfully'),

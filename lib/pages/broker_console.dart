@@ -79,14 +79,14 @@ class _AddProductPageState extends State<AddProductPage> {
     final productId = _firestore.collection('products').doc().id;
     final imageUrl = await uploadProductImage(pickedImage!, productId);
 
-    await _firestore.collection('products').doc(productId).set({
-      'name': productNameController.text,
-      'description': productDescriptionController.text,
-      'price': double.parse(productPriceController.text),
-      'imageUrl': imageUrl,
-      'vehicleNumber': vehicleNumber,
-      'brokerMailId': _auth.currentUser!.email, // Set the brokerMailId to the current user's email
-    });
+      await _firestore.collection('products').doc(productId).set({
+        'name': productNameController.text,
+        'description': productDescriptionController.text,
+        'price': double.parse(productPriceController.text),
+        'imageUrl': imageUrl,
+        'vehicleNumber': vehicleNumber,
+        'brokerMailId': _auth.currentUser!.email, // Set the brokerMailId to the current user's email
+      });
 
     productNameController.clear();
     productDescriptionController.clear();

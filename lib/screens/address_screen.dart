@@ -15,13 +15,26 @@ class AddressScreen extends StatefulWidget {
 
 class _AddressScreenState extends State<AddressScreen> {
   final _addressController = TextEditingController();
-  String? _currentAddress;
+  String? _selectedAddress;
+  List<String> _savedAddresses = [];
 
   @override
   void initState() {
     super.initState();
-    _addressController.text = widget.initialAddress?? '';
-    _currentAddress = widget.initialAddress;
+    _addressController.text = widget.initialAddress ?? '';
+    _selectedAddress = widget.initialAddress;
+    _fetchSavedAddresses();
+  }
+
+  Future<void> _fetchSavedAddresses() async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    final userDoc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+    final userData = userDoc.data();
+    if (userData != null && userData['savedAddresses'] != null) {
+      setState(() {
+        _savedAddresses = List<String>.from(userData['savedAddresses']);
+      });
+    }
   }
 
   @override
@@ -41,7 +54,7 @@ class _AddressScreenState extends State<AddressScreen> {
       final address = '${placemarks[0].thoroughfare}, ${placemarks[0].locality}, ${placemarks[0].postalCode}';
       setState(() {
         _addressController.text = address;
-        _currentAddress = address;
+        _selectedAddress = address;
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -50,14 +63,6 @@ class _AddressScreenState extends State<AddressScreen> {
         ),
       );
     }
-  }
-
-  Future<void> _saveAddress() async {
-    final userId = FirebaseAuth.instance.currentUser!.uid;
-    await FirebaseFirestore.instance.collection('users').doc(userId).update({
-      'address': _addressController.text,
-    });
-    Navigator.pop(context, _addressController.text);
   }
 
   @override
@@ -73,13 +78,73 @@ class _AddressScreenState extends State<AddressScreen> {
             decoration: InputDecoration(
               labelText: 'Address',
             ),
+            onChanged: (value) {
+              setState(() {
+                _selectedAddress = value;
+              });
+            },
+          ),
+          DropdownButtonFormField<String>(
+            value: _selectedAddress,
+            decoration: InputDecoration(
+              labelText: 'Saved Addresses',
+            ),
+            onChanged: (value) {
+              setState(() {
+                _addressController.text = value!;
+                _selectedAddress = value;
+              });
+            },
+            items: _savedAddresses.map((address) {
+              return DropdownMenuItem<String>(
+                value: address,
+                child: Text(address),
+              );
+            }).toList(),
           ),
           ElevatedButton(
             onPressed: _getCurrentLocation,
             child: Text('Get Current Location'),
           ),
           ElevatedButton(
-            onPressed: _saveAddress,
+            onPressed: () async {
+              if (_selectedAddress != null) {
+                final userId = FirebaseAuth.instance.currentUser!.uid;
+                final userRef = FirebaseFirestore.instance.collection('users').doc(userId);
+                final userData = await userRef.get();
+                if (userData != null && userData['savedAddresses'] != null) {
+                  final savedAddresses = List<String>.from(userData['savedAddresses']);
+                  if (!savedAddresses.contains(_selectedAddress)) {
+                    savedAddresses.add(_selectedAddress!);
+                    await userRef.update({'savedAddresses': savedAddresses});
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Address saved successfully'),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Address already exists'),
+                      ),
+                    );
+                  }
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('User data not found'),
+                    ),
+                  );
+                }
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please enter an address'),
+                  ),
+                );
+              }
+              Navigator.pop(context, _selectedAddress);
+            },
             child: Text('Save Address'),
           ),
         ],
