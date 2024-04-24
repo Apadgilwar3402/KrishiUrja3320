@@ -60,6 +60,31 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
+          const SizedBox(height: 20),
+          OutlinedButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => BrokerLoginPage()),
+              ).then((_) {
+                setState(() {}); // Refresh UI if needed
+              });
+            },
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: Colors.green, width: 2),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+              padding: const EdgeInsets.fromLTRB(40, 20, 40, 20),
+              backgroundColor: Colors.transparent,
+            ),
+            icon: const Icon(Icons.person, color: Colors.white),
+            label: const Text(
+              'Broker Login',
+              style: TextStyle(color: Colors.white, fontSize: 14),
+            ),
+          ),
+          const SizedBox(height: 20),
           OutlinedButton.icon(
             onPressed: () {
               Navigator.push(
@@ -80,30 +105,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
             icon: const Icon(Icons.person, color: Colors.white),
             label: const Text(
               'Admin Login',
-              style: TextStyle(color: Colors.white, fontSize: 14),
-            ),
-          ),
-          const SizedBox(height: 20),
-          OutlinedButton.icon(
-            onPressed: () {
-              Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => BrokerLoginPage()),
-              ).then((_) {
-              setState(() {}); // Refresh UI if needed
-              });
-            },
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: Colors.green, width: 2),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
-              ),
-              padding: const EdgeInsets.fromLTRB(40, 20, 40, 20),
-              backgroundColor: Colors.transparent,
-            ),
-            icon: const Icon(Icons.person, color: Colors.white),
-            label: const Text(
-              'Broker Login',
               style: TextStyle(color: Colors.white, fontSize: 14),
             ),
           ),

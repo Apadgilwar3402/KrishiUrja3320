@@ -1,142 +1,114 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:modernlogintute/pages/renting.dart';
-import 'package:modernlogintute/pages/weather.dart';
-import '../pages/order.dart';
-import '../pages/rates.dart';
-import '../pages/scheme.dart';
-import '../pages/Profile.dart';
+import 'package:modernlogintute/pages/about_us_screen.dart';
+import 'package:modernlogintute/pages/home_page.dart';
+import 'package:modernlogintute/pages/Profile.dart';
 
 class AppDrawer extends StatelessWidget {
-  final User user;
+  final User? user;
 
-  const AppDrawer({super.key, required this.user});
+  AppDrawer({required this.user}) : assert(user != null, 'User must not be null');
 
-  void signUserOut() {
+  void signUserOut(BuildContext context) {
     FirebaseAuth.instance.signOut();
+    Navigator.popUntil(context, ModalRoute.withName('/'));
   }
 
   @override
   Widget build(BuildContext context) {
-    String photoUrl = user.photoURL ?? '';
+    String photoUrl = user?.photoURL ?? '';
 
     return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: <Widget>[
-          DrawerHeader(
-            decoration: const BoxDecoration(
-              color: Colors.lightGreen,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Colors.white,
-                  child: photoUrl.isNotEmpty
-                      ? ClipOval(
-                          child: Image.network(
-                            photoUrl,
-                            width: 60,
-                            height: 60,
-                            fit: BoxFit.cover,
-                          ),
-                        )
-                      : const Icon(
-                          Icons.person,
-                          color: Colors.green,
-                          size: 30,
-                        ),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  'User Name',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
+      child: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.lightGreen,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundColor: Colors.white,
+                    child: photoUrl.isNotEmpty
+                        ? ClipOval(
+                      child: Image.network(
+                        photoUrl,
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                        : Icon(
+                      Icons.person,
+                      color: Colors.green,
+                      size: 30,
+                    ),
                   ),
-                ),
-                Text(
-                  user.email!,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  SizedBox(height: 10),
+                  Text(
+                    'User Name',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                    ),
                   ),
-                ),
-              ],
+                  Text(
+                    user!.email!,
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          ListTile(
-            title: const Text('Renting'),
-            leading: const Icon(Icons.agriculture),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Renting()),
-              );
-            },
-          ),
-          ListTile(
-            title: const Text('order'),
-            leading: const Icon(Icons.agriculture),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const UserOrdersScreen()),
-              );
-            },
-          ),
-          ListTile(
-            title: const Text('Weather Forecast'),
-            leading: const Icon(Icons.cloud),
-            onTap: () {
-              // Navigate to the weather forecast module
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const WeatherScreen()),
-              );
-            },
-          ),
-          ListTile(
-            title: const Text('Rates'),
-            leading: const Icon(Icons.attach_money),
-            onTap: () {
-              // Navigate to the rates page
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => RatesPage(user: user)),
-              );
-            },
-          ),
-          ListTile(
-            title: const Text('Scheme'),
-            leading: const Icon(Icons.file_copy),
-            onTap: () {
-              // Navigate to the weather forecast module
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const scheme()),
-              );
-            },
-          ),
-          ListTile(
-            title: const Text('Profile'),
-            leading: const Icon(Icons.man),
-            onTap: () {
-              // Navigate to the weather forecast module
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ProfileScreen()),
-              );
-            },
-          ),
-          ListTile(
-            title: const Text('Logout'),
-            leading: const Icon(Icons.logout),
-            onTap: signUserOut,
-          ),
-        ],
+            Expanded(
+              child: Column(
+                children: [
+                  ListTile(
+                    title: Text('Profile'),
+                    leading: Icon(Icons.person),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ProfileScreen()),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    title: Text('Home'), // Add a new ListTile for the Home page
+                    leading: Icon(Icons.home),
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => HomePage()),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    title: Text('About Us'),
+                    leading: Icon(Icons.info),
+                    onTap: () {
+                      if (user != null) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => AboutUsScreen()),
+                        );
+                      }
+                    },
+                  ),
+                  ListTile(
+                    title: Text('Logout'),
+                    leading: Icon(Icons.logout),
+                    onTap: () => signUserOut(context),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

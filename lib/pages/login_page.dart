@@ -9,7 +9,7 @@ import '../components/square_tile.dart';
 import '../services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({Key? key, required void Function() onTap}) : super(key: key);
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -115,7 +115,7 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   // google button
                   SquareTile(
-                      onTap: () => AuthService().signInWithGoogle() ,
+                      onTap: () => AuthService().SignInWithGoogle() ,
                       imagePath: 'lib/images/google.png'),
 
                   const SizedBox(width: 25),

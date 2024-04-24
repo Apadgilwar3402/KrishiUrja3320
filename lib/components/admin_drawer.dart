@@ -1,16 +1,25 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../pages/AdminProductConsole.dart';
-import '../pages/admin_Console.dart';
-import '../pages/rates_console.dart';
+import 'package:modernlogintute/pages/admin_Console.dart';
+import 'package:modernlogintute/pages/admin_login.dart';
+//import 'package:modernlogintute/pages/broker_console.dart';
+import 'package:modernlogintute/pages/crop_list.dart';
+import 'package:modernlogintute/pages/weather.dart';
+// Import the AdminLoginPage
 
-class AppDrawer extends StatelessWidget {
+class AppDrawer1 extends StatelessWidget {
   final User user;
+  final BuildContext context;
 
-  const AppDrawer({super.key, required this.user});
+  AppDrawer1({required this.user, required this.context});
 
   void signUserOut() {
     FirebaseAuth.instance.signOut();
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => AdminLoginPage()), // Navigate back to AdminLoginPage
+          (route) => false, // Clear all previous routes
+    );
   }
 
   @override
@@ -22,7 +31,7 @@ class AppDrawer extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: Colors.lightGreen,
             ),
             child: Column(
@@ -40,15 +49,15 @@ class AppDrawer extends StatelessWidget {
                       fit: BoxFit.cover,
                     ),
                   )
-                      : const Icon(
+                      : Icon(
                     Icons.person,
                     color: Colors.green,
                     size: 30,
                   ),
                 ),
-                const SizedBox(height: 10),
-                const Text(
-                  'Admin Name',
+                SizedBox(height: 10),
+                Text(
+                  'User Name',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -56,45 +65,59 @@ class AppDrawer extends StatelessWidget {
                 ),
                 Text(
                   user.email!,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                   ),
                 ),
               ],
             ),
           ),
+          //ListTile(
+            // title: Text('Renting'),
+            // leading: Icon(Icons.agriculture),
+            // onTap: () {
+            //   // Navigate to the renting module
+            //   // Navigator.push(
+            //   //   context,
+            //   //   MaterialPageRoute(builder: (context) => CustomAppBar()),
+            //   // );
+            // },
+          //),
           ListTile(
-            title: const Text('Products'),
-            leading: const Icon(Icons.agriculture),
+            title: Text('Weather Forecast'),
+            leading: Icon(Icons.cloud),
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => AdminProductScreen()),
+                MaterialPageRoute(builder: (context) => const Forecaste()),
               );
-            },
-          ),
-           ListTile(
-            title: const Text('Scheme'),
-            leading: const Icon(Icons.people),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => RateConsole()),
-              );
+              // Navigate to the weather forecast module
             },
           ),
           ListTile(
-            title: const Text('Rates'),
-            leading: const Icon(Icons.agriculture),
+            title: Text('Rates'),
+            leading: Icon(Icons.attach_money),
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => AdminConsole() ),);
+                MaterialPageRoute(builder: (context) => CropList()),);
+              // Navigate to the rates and schemes module
+            },
+          ),
+
+          ListTile(
+            title: Text('Schemes'),
+            leading: Icon(Icons.attach_money),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AdminConsole()),);
+              // Navigate to the rates and schemes module
             },
           ),
           ListTile(
-            title: const Text('Logout'),
-            leading: const Icon(Icons.logout),
+            title: Text('Logout'),
+            leading: Icon(Icons.logout),
             onTap: signUserOut,
           ),
         ],

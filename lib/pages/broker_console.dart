@@ -142,14 +142,8 @@ class _AddProductPageState extends State<AddProductPage> {
             ),
             ListTile(
               title: Text('Logout'),
-              onTap: () async {
-                await FirebaseAuth.instance.signOut();
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  '/login',
-                      (route) => false,
-                );
-              },
+              leading: Icon(Icons.logout),
+              onTap: () => signUserOut(context),
             ),
           ],
         ),
@@ -208,6 +202,11 @@ class _AddProductPageState extends State<AddProductPage> {
       ),
     );
   }
+
+  signUserOut(BuildContext context) {
+    FirebaseAuth.instance.signOut();
+      Navigator.popUntil(context, ModalRoute.withName('/'));
+    }
 }
 
 // Add Product class definition here
