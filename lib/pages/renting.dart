@@ -1,19 +1,27 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+
 
 import 'CartScreen.dart';
 import 'WishlistScreen.dart';
-import 'add_product.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Renting App',
+      home: Renting(),
+    );
+  }
 }
 
 class Product {
@@ -30,7 +38,7 @@ class Product {
     required this.description,
     required this.price,
     required this.imageUrl,
-    required this.vehicleNumber,
+    required this.vehicleNumber, required brokerId, required brokerEmail, required brokerMailId,
   });
 
   factory Product.fromDocument(DocumentSnapshot doc) {
@@ -42,6 +50,8 @@ class Product {
       price: data['price'],
       imageUrl: data['imageUrl'],
       vehicleNumber: data['vehicleNumber'],
+      brokerId: data['brokerId'],
+      brokerEmail: data['brokerMailId'], brokerMailId: data['brokerMailId'],
     );
   }
 }
@@ -54,15 +64,7 @@ class Renting extends StatefulWidget {
 class _RentingState extends State<Renting> {
   List<Product> products = [];
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseStorage _storage = FirebaseStorage.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  bool _isAddingProduct = false;
-
-  final productNameController = TextEditingController();
-  final productDescriptionController = TextEditingController();
-  File? pickedImage;
-  final productPriceController = TextEditingController();
-  final vehicleNumberController = TextEditingController();
 
   @override
   void initState() {
@@ -70,6 +72,7 @@ class _RentingState extends State<Renting> {
     fetchProducts();
     fetchCartAndWishlistItems();
   }
+
   Future<void> fetchCartAndWishlistItems() async {
     final userId = _auth.currentUser!.uid;
 
@@ -95,82 +98,14 @@ class _RentingState extends State<Renting> {
       // Update the UI with the fetched wishlist items
     }
   }
+
   Future<void> fetchProducts() async {
     final querySnapshot = await _firestore.collection('products').get();
-    final productData = querySnapshot.docs.map((doc) => Product(
-      id: doc.id,
-      name: doc.data()['name'],
-      description: doc.data()['description'],
-      price: doc.data()['price'],
-      imageUrl: doc.data()['imageUrl'],
-      vehicleNumber: doc.data()['vehicleNumber'],
-    )).toList();
+    final productData = querySnapshot.docs.map((doc) => Product.fromDocument(doc)).toList();
 
     setState(() {
       products = productData;
     });
-  }
-
-  Future<File?> pickImage(ImageSource source) async {
-    final pickedFile = await ImagePicker().pickImage(source: source);
-    if (pickedFile != null) {
-      return File(pickedFile.path);
-    }
-    return null;
-  }
-
-  Future<String> uploadProductImage(File imageFile, String productId) async {
-    final storageRef = _storage.ref().child('users/${_auth.currentUser!.uid}/products/$productId');
-
-    final uploadTask = storageRef.putFile(imageFile);
-    final snapshot = await uploadTask.whenComplete(() {});
-    final downloadUrl = await snapshot.ref.getDownloadURL();
-
-    return downloadUrl;
-  }
-
-  Future<void> addProduct() async {
-    final vehicleNumber = vehicleNumberController.text.trim();
-
-    if (vehicleNumber.isEmpty || vehicleNumber.length != 10) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter a valid vehicle number.'),
-        ),
-      );
-      return;
-    }
-
-    if (pickedImage == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please pick an image for the product.'),
-        ),
-      );
-      return;
-    }
-
-    final productId = _firestore.collection('products').doc().id;
-    final imageUrl = await uploadProductImage(pickedImage!, productId);
-
-    await _firestore.collection('products').doc(productId).set({
-      'name': productNameController.text,
-      'description': productDescriptionController.text,
-      'price': double.parse(productPriceController.text),
-      'imageUrl': imageUrl,
-      'vehicleNumber': vehicleNumber,
-    });
-
-    productNameController.clear();
-    productDescriptionController.clear();
-    productPriceController.clear();
-    vehicleNumberController.clear();
-    setState(() {
-      pickedImage = null;
-      _isAddingProduct = false;
-    });
-
-    fetchProducts();
   }
 
   void _showProductOptions(Product product) {
@@ -188,14 +123,22 @@ class _RentingState extends State<Renting> {
                 final cartDoc = _firestore.collection('carts').doc(userId);
                 final cartData = (await cartDoc.get()).data();
                 final itemIds = cartData?['itemIds'] ?? [];
-                itemIds.add(product.id);
-                await cartDoc.set({'itemIds': itemIds});
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Product added to Cart.'),
-                  ),
-                );
-                fetchCartAndWishlistItems();
+                if (!itemIds.contains(product.id)) {
+                  itemIds.add(product.id);
+                  await cartDoc.set({'itemIds': itemIds});
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Product added to Cart.'),
+                    ),
+                  );
+                  fetchCartAndWishlistItems();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Product already in Cart.'),
+                    ),
+                  );
+                }
                 Navigator.pop(context);
               },
             ),
@@ -207,14 +150,22 @@ class _RentingState extends State<Renting> {
                 final wishlistDoc = _firestore.collection('wishlists').doc(userId);
                 final wishlistData = (await wishlistDoc.get()).data();
                 final itemIds = wishlistData?['itemIds'] ?? [];
-                itemIds.add(product.id);
-                await wishlistDoc.set({'itemIds': itemIds});
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Product added to Wishlist.'),
-                  ),
-                );
-                fetchCartAndWishlistItems();
+                if (!itemIds.contains(product.id)) {
+                  itemIds.add(product.id);
+                  await wishlistDoc.set({'itemIds': itemIds});
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Product added to Wishlist.'),
+                    ),
+                  );
+                  fetchCartAndWishlistItems();
+                }  else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Product already in Wishlist.'),
+                    ),
+                  );
+                }
                 Navigator.pop(context);
               },
             ),
@@ -230,15 +181,6 @@ class _RentingState extends State<Renting> {
       appBar: AppBar(
         title: Text('Product List'),
         actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => _isAddingProduct ? Renting() : AddProductPage()),
-              );
-            },
-            icon: Icon(_isAddingProduct ? Icons.close : Icons.add),
-          ),
           IconButton(
             onPressed: () {
               Navigator.of(context).pushReplacement(
@@ -261,93 +203,7 @@ class _RentingState extends State<Renting> {
           ),
         ],
       ),
-      body: _isAddingProduct
-          ? Column(
-        children: [
-          Container(
-            padding: EdgeInsets.all(16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Add Product',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _isAddingProduct = false;
-                    });
-                  },
-                  icon: Icon(Icons.close),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: 1,
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    ListTile(
-                      leading: IconButton(
-                        onPressed: () async {
-                          final picked = await pickImage(ImageSource.gallery);
-                          if (picked != null) {
-                            setState(() {
-                              pickedImage = picked;
-                            });
-                          }
-                        },
-                        icon: Icon(Icons.camera_alt),
-                      ),
-                      title: TextField(
-                        controller: productNameController,
-                        decoration: InputDecoration(
-                          labelText: 'Product Name',
-                        ),
-                      ),
-                      subtitle: TextField(
-                        controller: productDescriptionController,
-                        decoration: InputDecoration(
-                          labelText: 'Product Description',
-                        ),
-                      ),
-                      trailing: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TextField(
-                            controller: productPriceController,
-                            decoration: InputDecoration(
-                              labelText: 'Product Price',
-                            ),
-                            keyboardType: TextInputType.number,
-                          ),
-                          TextField(
-                            controller: vehicleNumberController,
-                            decoration: InputDecoration(
-                              labelText: 'Vehicle Number',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: addProduct,
-                      child: Text('Add Product'),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-        ],
-      )
-          : ListView.builder(
+      body: ListView.builder(
         itemCount: products.length,
         itemBuilder: (context, index) {
           final product = products[index];

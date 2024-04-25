@@ -72,7 +72,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           padding: const EdgeInsets.all(50),
           child: ElevatedButton(
             onPressed: () {
-              // Navigate to AuthPage
+              // Navigate to Screen page
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => const Screen()),
               );
@@ -85,12 +85,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
               minimumSize: const Size(300, 20),
               padding: const EdgeInsets.all(22),
             ),
-            child: Text(
-              'Get Started',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-              ),
+            child: const Text('Get Started',
+              style: TextStyle(color: Colors.black),
             ),
           ),
         ),
