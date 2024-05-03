@@ -5,8 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modernlogintute/components/admin_drawer.dart';
 import 'package:modernlogintute/pages/rates_console.dart';
-import 'package:modernlogintute/pages/rateconsole1.dart';
-import 'package:modernlogintute/pages/rateconsole2.dart';
+import 'package:modernlogintute/pages/Rice.dart';
+import 'package:modernlogintute/pages/Jowar.dart';
 
 class CropList extends StatelessWidget {
   const CropList({Key? key}) : super(key: key);
