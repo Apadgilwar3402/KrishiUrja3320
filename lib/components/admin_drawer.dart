@@ -2,9 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modernlogintute/pages/admin_Console.dart';
 import 'package:modernlogintute/pages/admin_login.dart';
+
 //import 'package:modernlogintute/pages/broker_console.dart';
 import 'package:modernlogintute/pages/crop_list.dart';
 import 'package:modernlogintute/pages/weather.dart';
+
+import '../pages/AdminRentRequests.dart';
 // Import the AdminLoginPage
 
 class AppDrawer1 extends StatelessWidget {
@@ -72,17 +75,18 @@ class AppDrawer1 extends StatelessWidget {
               ],
             ),
           ),
-          //ListTile(
-            // title: Text('Renting'),
-            // leading: Icon(Icons.agriculture),
-            // onTap: () {
-            //   // Navigate to the renting module
-            //   // Navigator.push(
-            //   //   context,
-            //   //   MaterialPageRoute(builder: (context) => CustomAppBar()),
-            //   // );
-            // },
-          //),
+          ListTile(
+            title: Text('Renting'),
+            leading: Icon(Icons.agriculture),
+            onTap: () {
+              //Navigate to the renting module
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => AdminRentRequestsScreen()),
+              );
+            },
+          ),
           ListTile(
             title: Text('Weather Forecast'),
             leading: Icon(Icons.cloud),
