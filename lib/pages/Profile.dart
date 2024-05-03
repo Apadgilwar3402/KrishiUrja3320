@@ -68,8 +68,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _updateProfile() async {
     if (_formKey.currentState!.validate()) {
       try {
-        final userDoc = FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid);
-        if ((await userDoc.get()).exists) {
+        final userDoc = FirebaseFirestore.instance
+            .collection('users')
+            .doc(FirebaseAuth.instance.currentUser!.uid);
+        final userSnapshot = await userDoc.get();
+
+        if (userSnapshot.exists) {
           await userDoc.update({
             'name': _nameController.text,
             'email': _emailController.text,
@@ -82,18 +86,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
               'profile_picture_url': _profilePictureUrl,
             });
           }
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Profile updated successfully'),
-            ),
-          );
-          _loadUserData();
         } else {
-          setState(() {
-            _errorMessage = 'User document not found';
+          await userDoc.set({
+            'name': _nameController.text,
+            'email': _emailController.text,
+            'address': _addressController.text,
+            'mobile_number': _mobileNumberController.text,
+            'profile_picture_url': _profilePictureUrl,
           });
         }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Profile updated successfully'),
+          ),
+        );
+        _loadUserData();
       } catch (e) {
         setState(() {
           _errorMessage = 'Failed to update profile: $e';

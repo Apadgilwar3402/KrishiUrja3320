@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 
+import '../models/product_model.dart';
 import 'CartScreen.dart';
 import 'WishlistScreen.dart';
 
@@ -20,38 +21,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Renting App',
       home: Renting(),
-    );
-  }
-}
-
-class Product {
-  final String id;
-  final String name;
-  final String description;
-  final double price;
-  final String imageUrl;
-  final String vehicleNumber;
-
-  Product({
-    required this.id,
-    required this.name,
-    required this.description,
-    required this.price,
-    required this.imageUrl,
-    required this.vehicleNumber, required brokerId, required brokerEmail, required brokerMailId,
-  });
-
-  factory Product.fromDocument(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    return Product(
-      id: doc.id,
-      name: data['name'],
-      description: data['description'],
-      price: data['price'],
-      imageUrl: data['imageUrl'],
-      vehicleNumber: data['vehicleNumber'],
-      brokerId: data['brokerId'],
-      brokerEmail: data['brokerMailId'], brokerMailId: data['brokerMailId'],
     );
   }
 }

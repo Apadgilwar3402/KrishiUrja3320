@@ -2,30 +2,9 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../models/product_model.dart';
 import 'RentingScreen.dart';
 import 'renting.dart';
-
-class Product {
-  final String id;
-  final String brokerId;
-  final String? brokerMailId;
-  final String description;
-  final String imageUrl;
-  final String name;
-  final int price;
-  final String vehicleNumber;
-
-  Product({
-    required this.id,
-    required this.brokerId,
-    this.brokerMailId,
-    required this.description,
-    required this.imageUrl,
-    required this.name,
-    required this.price,
-    required this.vehicleNumber,
-  });
-}
 
 class RentRequestsScreen extends StatefulWidget {
   @override
@@ -132,32 +111,38 @@ class _RentRequestsScreenState extends State<RentRequestsScreen> {
             itemCount: rentRequests.length,
             itemBuilder: (context, index) {
               final rentRequest = rentRequests[index];
-              final productId = rentRequest.productIds.first;
+                    return FutureBuilder<List<dynamic>>(
+                      future: _loadProductAndUserData(rentRequest),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        }
 
-              return FutureBuilder<Product>(
-                future: _loadProduct(productId),
-                builder: (context, productSnapshot) {
-                  if (productSnapshot.hasError) {
-                    return Text('Error: ${productSnapshot.error}');
-                  }
+                        if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        }
 
-                  if (productSnapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  }
+                        final data = snapshot.data!;
+                        final product = data[0] as Product;
+                        final userData = data[1] as Map<String, dynamic>;
 
-                  final product = productSnapshot.data!;
-
-                  return ListTile(
-                    leading: Image.network(product.imageUrl),
-                    title: Text(product.name),
-                    subtitle: Text('${product.brokerMailId}\n${rentRequest.renterName} - ${rentRequest.renterEmail}\n${rentRequest.renterAddress}'),
-                    trailing: Text(rentRequest.timestamp.toDate().toString()),
-                    onTap: () {
-                      _showProducts(rentRequest, (brokerMailId) {
-                        // Handle the broker email here
-                      });
-                    },
-                  );
+                        return ListTile(
+                          leading: Image.network(product.imageUrl),
+                          title: Text(product.name),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Broker Email: ${product.brokerMailId}'),
+                              Text('Renter Name: ${rentRequest.renterName}'),
+                              Text('Renter Email: ${rentRequest.renterEmail}'),
+                              Text(
+                                  'Renter Address: ${rentRequest.renterAddress}'),
+                              Text(
+                                  'Requested on: ${rentRequest.timestamp.toDate()}'),
+                            ],
+                          ),
+                        );
                 },
               );
             },
@@ -193,6 +178,23 @@ class _RentRequestsScreenState extends State<RentRequestsScreen> {
       vehicleNumber: vehicleNumber,
     );
   }
+}
+
+Future<List<dynamic>> _loadProductAndUserData(RentRequest rentRequest) async {
+  final productId = rentRequest.productIds.first;
+  final productDoc = await FirebaseFirestore.instance
+      .collection('products')
+      .doc(productId)
+      .get();
+  final product = Product.fromDocument(productDoc);
+
+  final userDoc = await FirebaseFirestore.instance
+      .collection('users')
+      .doc(rentRequest.renterId)
+      .get();
+  final userData = userDoc.data();
+
+  return [product, userData];
 }
 
 class RentRequest {
