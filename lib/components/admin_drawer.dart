@@ -111,11 +111,12 @@ class AppDrawer1 extends StatelessWidget {
 
           ListTile(
             title: Text('Schemes'),
-            leading: Icon(Icons.attach_money),
+            leading: Icon(Icons.attach_file),
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => AdminConsole()),);
+                MaterialPageRoute(builder: (context) => AdminConsole()),
+              );
               // Navigate to the rates and schemes module
             },
           ),

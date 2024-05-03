@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modernlogintute/components/app_drawer.dart';
-import 'package:modernlogintute/pages/rates.dart';
+import 'package:modernlogintute/pages/Wheat.dart';
 import 'package:modernlogintute/pages/ratespage1.dart';
 import 'package:modernlogintute/pages/ratespage2.dart';
 

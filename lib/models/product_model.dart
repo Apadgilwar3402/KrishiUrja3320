@@ -25,17 +25,33 @@ class Product {
   });
 
   factory Product.fromDocument(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final data = doc.data() as Map<String, dynamic>?;
+    if (data == null) {
+      print('Error: Product document data is null');
+      return Product.empty();
+    }
+
     return Product(
       id: doc.id,
-      name: data['name'],
-      description: data['description'],
-      price: data['price'],
-      imageUrl: data['imageUrl'],
-      vehicleNumber: data['vehicleNumber'],
-      brokerId: data['brokerId'],
+      name: data['name'] ?? '',
+      description: data['description'] ?? '',
+      price: data['price']?.toDouble() ?? 0.0,
+      imageUrl: data['imageUrl'] ?? '',
+      vehicleNumber: data['vehicleNumber'] ?? '',
+      brokerId: data['brokerId'] ?? '',
       brokerEmail: data['brokerEmail'],
       brokerMailId: data['brokerMailId'],
     );
   }
+
+  Product.empty()
+      : id = '',
+        name = '',
+        description = '',
+        price = 0.0,
+        imageUrl = '',
+        vehicleNumber = '',
+        brokerId = '',
+        brokerEmail = null,
+        brokerMailId = null;
 }
