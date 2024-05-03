@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../models/product_model.dart';
 import '../screens/address_screen.dart';
 import 'order.dart';
 import 'renting.dart';
