@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import '../models/product_model.dart';
 import 'RentRequestsScreen.dart';
 import 'renting.dart';
@@ -131,19 +130,20 @@ class _AdminRentRequestsScreenState extends State<AdminRentRequestsScreen> {
   }
 
   Future<List<dynamic>> _loadProductAndUserData(RentRequest rentRequest) async {
+    //get product data
     final productId = rentRequest.productIds.first;
     final productDoc = await FirebaseFirestore.instance
         .collection('products')
         .doc(productId)
         .get();
     final product = Product.fromDocument(productDoc);
-
+    // get renter information
     final renterDoc = await FirebaseFirestore.instance
         .collection('users')
         .doc(rentRequest.renterId)
         .get();
     final renterData = renterDoc.data();
-
+    //get broker details
     final ownerId = productDoc.data()?['brokerId'];
     final ownerDoc = await FirebaseFirestore.instance
         .collection('brokerUsers')
