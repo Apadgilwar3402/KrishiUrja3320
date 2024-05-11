@@ -1,60 +1,41 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class UserOrdersScreen extends StatefulWidget {
-  const UserOrdersScreen({Key? key}) : super(key: key);
+  final String rentRequestId;
+
+  const UserOrdersScreen({Key? key, required this.rentRequestId})
+      : super(key: key);
 
   @override
   _UserOrdersScreenState createState() => _UserOrdersScreenState();
 }
 
 class _UserOrdersScreenState extends State<UserOrdersScreen> {
-  Stream<List<RentRequest>> _ordersStream = Stream.value([]);
+  late Stream<DocumentSnapshot> _rentRequestStream;
 
   @override
   void initState() {
     super.initState();
-    _ordersStream = _getOrdersStream();
-  }
-
-  Stream<List<RentRequest>> _getOrdersStream() {
-    final userId = FirebaseAuth.instance.currentUser?.uid;
-    if (userId == null) {
-      return Stream.value([]);
+    if (widget.rentRequestId.isNotEmpty) {
+      _rentRequestStream = FirebaseFirestore.instance
+          .collection('rentRequests')
+          .doc(widget.rentRequestId)
+          .snapshots();
+    } else {
+      // Handle the case where rentRequestId is empty or null
+      _rentRequestStream = Stream.empty();
     }
-
-    return FirebaseFirestore.instance
-        .collection('users')
-        .doc(userId)
-        .collection('rentRequests')
-        .orderBy('timestamp', descending: true)
-        .snapshots()
-        .map((query) {
-      return query.docs.map((doc) {
-        final data = doc.data();
-        final productIds = List<String>.from(data['productIds'] ?? []);
-        return RentRequest(
-          id: doc.id,
-          userId: userId,
-          productIds: productIds,
-          renterName: data['renterName'] ?? '',
-          renterEmail: data['renterEmail'] ?? '',
-          renterAddress: data['renterAddress'] ?? '',
-          timestamp: data['timestamp'] ?? Timestamp.now(),
-        );
-      }).toList();
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Rent Requests'),
+        title: const Text('Rent Request'),
       ),
-      body: StreamBuilder<List<RentRequest>>(
-        stream: _ordersStream,
+      body: StreamBuilder<DocumentSnapshot>(
+        stream: _rentRequestStream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -64,46 +45,83 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
             return Center(
               child: Text('Error: ${snapshot.error}'),
             );
-          } else if (snapshot.data == null || snapshot.data!.isEmpty) {
+          } else if (!snapshot.hasData || !snapshot.data!.exists) {
             return const Center(
-              child: Text('No rent requests found.'),
+              child: Text('Rent request not found.'),
             );
           } else {
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                final order = snapshot.data![index];
-                return ListTile(
-                  title: Text('${order.renterName} (${order.renterEmail})'),
-                  subtitle: Text(
-                      'Address: ${order.renterAddress}\nProducts: ${order.productIds.length}'),
-                  trailing: Text('Requested on: ${order.timestamp.toDate()}'),
-                );
-              },
+            final rentRequest = snapshot.data!.data() as Map<String, dynamic>?;
+            if (rentRequest == null) {
+              return const Center(
+                child: Text('Invalid rent request data.'),
+              );
+            }
+
+            final productIds = List<String>.from(rentRequest['productIds']);
+            final renterName = rentRequest['renterName'];
+            final renterEmail = rentRequest['renterEmail'];
+            final renterAddress = rentRequest['renterAddress'];
+            final timestamp = rentRequest['timestamp'];
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Renter Name: $renterName'),
+                Text('Renter Email: $renterEmail'),
+                Text('Renter Address: $renterAddress'),
+                Text('Product IDs: ${productIds.join(', ')}'),
+                Text('Requested on: $timestamp'),
+                // Display product details
+                FutureBuilder(
+                  future: Future.wait(productIds.map((productId) async {
+                    final productDoc = await FirebaseFirestore.instance
+                        .collection('products')
+                        .doc(productId)
+                        .get();
+                    return productDoc.data() as Map<String, dynamic>?;
+                  })),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else if (snapshot.hasError) {
+                      return Center(
+                        child: Text('Error: ${snapshot.error}'),
+                      );
+                    } else {
+                      final products =
+                          snapshot.data as List<Map<String, dynamic>>?;
+                      if (products == null) {
+                        return const Center(
+                          child: Text('No products found.'),
+                        );
+                      }
+
+                      return Column(
+                        children: products.map((product) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Product Name: ${product['name']}'),
+                              Text(
+                                  'Product Description: ${product['description']}'),
+                              Text('Product Image URL: ${product['imageUrl']}'),
+                              Text('Product Price: ${product['price']}'),
+                              Text(
+                                  'Product Vehicle Number: ${product['vehicleNumber']}'),
+                            ],
+                          );
+                        }).toList(),
+                      );
+                    }
+                  },
+                ),
+              ],
             );
           }
         },
       ),
     );
   }
-}
-
-class RentRequest {
-  final String id;
-  final String userId;
-  final List<String> productIds;
-  final String renterName;
-  final String renterEmail;
-  final String renterAddress;
-  final Timestamp timestamp;
-
-  RentRequest({
-    required this.id,
-    required this.userId,
-    required this.productIds,
-    required this.renterName,
-    required this.renterEmail,
-    required this.renterAddress,
-    required this.timestamp,
-  });
 }

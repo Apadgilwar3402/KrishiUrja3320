@@ -87,8 +87,6 @@ class _RentingScreenState extends State<RentingScreen> {
         'timestamp': FieldValue.serverTimestamp(),
       };
       final rentRequest = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(productOwnerId)
           .collection('rentRequests')
           .add(rentData);
       _rentRequests.add(RentRequest(
@@ -126,7 +124,7 @@ class _RentingScreenState extends State<RentingScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => UserOrdersScreen(
-          rentRequests: _rentRequests,
+          rentRequestId: '',
         ),
       ),
     );
@@ -234,67 +232,6 @@ class _RentingScreenState extends State<RentingScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class UserOrdersScreen extends StatefulWidget {
-  final List<RentRequest> rentRequests;
-  const UserOrdersScreen({Key? key, required this.rentRequests}) : super(key: key);
-
-  @override
-  _UserOrdersScreenState createState() => _UserOrdersScreenState();
-}
-
-class _UserOrdersScreenState extends State<UserOrdersScreen> {
-  Stream<List<RentRequest>> _ordersStream = Stream.value([]);
-
-  @override
-  void initState() {
-    super.initState();
-    _ordersStream = _getOrdersStream();
-  }
-
-  Stream<List<RentRequest>> _getOrdersStream() {
-    return Stream.value(widget.rentRequests);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Rent Requests'),
-      ),
-      body: StreamBuilder<List<RentRequest>>(
-        stream: _ordersStream,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
-          } else if (snapshot.data == null || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text('No rent requests found.'),
-            );
-          } else {
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                final order = snapshot.data![index];
-                return ListTile(
-                  title: Text(order.name),
-                  subtitle: Text('Requested on: ${order.timestamp.toDate()}'),
-                  trailing: Text('\₹${order.price}'),
-                );
-              },
-            );
-          }
-        },
       ),
     );
   }

@@ -80,7 +80,8 @@ class _AddProductPageState extends State<AddProductPage> {
     final imageUrl = await uploadProductImage(pickedImage!, productId);
 
       await _firestore.collection('products').doc(productId).set({
-        'name': productNameController.text,
+      'id': productId,
+      'name': productNameController.text,
         'description': productDescriptionController.text,
         'price': double.parse(productPriceController.text),
         'imageUrl': imageUrl,
@@ -211,6 +212,7 @@ class _AddProductPageState extends State<AddProductPage> {
 
 // Add Product class definition here
 class Product {
+  final String id;
   final String name;
   final String description;
   final double price;
@@ -219,6 +221,7 @@ class Product {
   final String? brokerMailId; // Add brokerMailId field
 
   Product({
+    required this.id,
     required this.name,
     required this.description,
     required this.price,
@@ -229,6 +232,7 @@ class Product {
 
   factory Product.fromDocument(DocumentSnapshot doc) {
     return Product(
+      id: doc['id'],
       name: doc['name'],
       description: doc['description'],
       price: doc['price'].toDouble(),
@@ -288,8 +292,13 @@ class _ProductListState extends State<ProductList> {
         itemBuilder: (context, index) {
           final product = products[index];
           return ListTile(
-            leading: Image.network(product.imageUrl),
-            title: Text(product.name),
+                  leading: Image.network(
+                    product.imageUrl,
+                    fit: BoxFit.cover, // Ensure all images are of the same size
+                    width: 100, // Set a fixed width for consistency
+                    height: 100, // Set a fixed height for consistency
+                  ),
+                  title: Text(product.name),
             subtitle: Text(product.vehicleNumber),
             trailing: Text('\$${product.price.toStringAsFixed(2)}'),
           );

@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-
 import '../models/product_model.dart';
 import 'CartScreen.dart';
 import 'WishlistScreen.dart';
@@ -32,36 +31,47 @@ class Renting extends StatefulWidget {
 class _RentingState extends State<Renting> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  User? _currentUser;
 
   @override
   void initState() {
     super.initState();
+    _getCurrentUser();
     fetchCartAndWishlistItems();
   }
 
+  Future<void> _getCurrentUser() async {
+    _currentUser = _auth.currentUser;
+  }
+
   Future<void> fetchCartAndWishlistItems() async {
-    final userId = _auth.currentUser!.uid;
+    if (_currentUser != null) {
+      final userId = _currentUser!.uid;
+      // Fetch cart items
+      final cartSnapshot =
+          await _firestore.collection('carts').doc(userId).get();
+      final cartData = cartSnapshot.data();
+      if (cartData != null && cartData.containsKey('itemIds')) {
+        final cartItemIds = List<String>.from(cartData['itemIds']);
+        final cartItems = await Future.wait(
+          cartItemIds
+              .map((id) => _firestore.collection('products').doc(id).get()),
+        );
+        // Update the UI with the fetched cart items
+      }
 
-    // Fetch cart items
-    final cartSnapshot = await _firestore.collection('carts').doc(userId).get();
-    final cartData = cartSnapshot.data();
-    if (cartData != null && cartData.containsKey('itemIds')) {
-      final cartItemIds = List<String>.from(cartData['itemIds']);
-      final cartItems = await Future.wait(
-        cartItemIds.map((id) => _firestore.collection('products').doc(id).get()),
-      );
-      // Update the UI with the fetched cart items
-    }
-
-    // Fetch wishlist items
-    final wishlistSnapshot = await _firestore.collection('wishlists').doc(userId).get();
-    final wishlistData = wishlistSnapshot.data();
-    if (wishlistData != null && wishlistData.containsKey('itemIds')) {
-      final wishlistItemIds = List<String>.from(wishlistData['itemIds']);
-      final wishlistItems = await Future.wait(
-        wishlistItemIds.map((id) => _firestore.collection('products').doc(id).get()),
-      );
-      // Update the UI with the fetched wishlist items
+      // Fetch wishlist items
+      final wishlistSnapshot =
+          await _firestore.collection('wishlists').doc(userId).get();
+      final wishlistData = wishlistSnapshot.data();
+      if (wishlistData != null && wishlistData.containsKey('itemIds')) {
+        final wishlistItemIds = List<String>.from(wishlistData['itemIds']);
+        final wishlistItems = await Future.wait(
+          wishlistItemIds
+              .map((id) => _firestore.collection('products').doc(id).get()),
+        );
+        // Update the UI with the fetched wishlist items
+      }
     }
   }
 
@@ -76,25 +86,27 @@ class _RentingState extends State<Renting> {
               leading: Icon(Icons.add_shopping_cart),
               title: Text('Add to Cart'),
               onTap: () async {
-                final userId = _auth.currentUser!.uid;
-                final cartDoc = _firestore.collection('carts').doc(userId);
-                final cartData = (await cartDoc.get()).data();
-                final itemIds = cartData?['itemIds'] ?? [];
-                if (!itemIds.contains(product.id)) {
-                  itemIds.add(product.id);
-                  await cartDoc.set({'itemIds': itemIds});
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Product added to Cart.'),
-                    ),
-                  );
-                  fetchCartAndWishlistItems();
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Product already in Cart.'),
-                    ),
-                  );
+                if (_currentUser != null) {
+                  final userId = _currentUser!.uid;
+                  final cartDoc = _firestore.collection('carts').doc(userId);
+                  final cartData = (await cartDoc.get()).data();
+                  final itemIds = cartData?['itemIds'] ?? [];
+                  if (!itemIds.contains(product.id)) {
+                    itemIds.add(product.id);
+                    await cartDoc.set({'itemIds': itemIds});
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Product added to Cart.'),
+                      ),
+                    );
+                    fetchCartAndWishlistItems();
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Product already in Cart.'),
+                      ),
+                    );
+                  }
                 }
                 Navigator.pop(context);
               },
@@ -103,25 +115,28 @@ class _RentingState extends State<Renting> {
               leading: Icon(Icons.favorite_border),
               title: Text('Add to Wishlist'),
               onTap: () async {
-                final userId = _auth.currentUser!.uid;
-                final wishlistDoc = _firestore.collection('wishlists').doc(userId);
-                final wishlistData = (await wishlistDoc.get()).data();
-                final itemIds = wishlistData?['itemIds'] ?? [];
-                if (!itemIds.contains(product.id)) {
-                  itemIds.add(product.id);
-                  await wishlistDoc.set({'itemIds': itemIds});
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Product added to Wishlist.'),
-                    ),
-                  );
-                  fetchCartAndWishlistItems();
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Product already in Wishlist.'),
-                    ),
-                  );
+                if (_currentUser != null) {
+                  final userId = _currentUser!.uid;
+                  final wishlistDoc =
+                      _firestore.collection('wishlists').doc(userId);
+                  final wishlistData = (await wishlistDoc.get()).data();
+                  final itemIds = wishlistData?['itemIds'] ?? [];
+                  if (!itemIds.contains(product.id)) {
+                    itemIds.add(product.id);
+                    await wishlistDoc.set({'itemIds': itemIds});
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Product added to Wishlist.'),
+                      ),
+                    );
+                    fetchCartAndWishlistItems();
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Product already in Wishlist.'),
+                      ),
+                    );
+                  }
                 }
                 Navigator.pop(context);
               },
@@ -204,7 +219,6 @@ class _RentingState extends State<Renting> {
           })
           .whereType<Product>()
           .toList();
-
       return productData;
     } catch (e) {
       print('Error fetching products: $e');
@@ -315,13 +329,14 @@ class _ProductTileState extends State<ProductTile> {
               children: [
                 Text(widget.product.vehicleNumber),
                 Text('\₹${widget.product.price.toStringAsFixed(1)}'),
-                // Display price on the right side
               ],
             ),
             onTap: () {
               setState(() {
                 _isExpanded = !_isExpanded;
               });
+              _showProductOptions(
+                  widget.product); // Add this line to show product options
             },
           ),
           if (_isExpanded)
