@@ -60,7 +60,7 @@ class AppDrawer1 extends StatelessWidget {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  'User Name',
+                  'Admin App Drawer',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -75,29 +75,29 @@ class AppDrawer1 extends StatelessWidget {
               ],
             ),
           ),
-          ListTile(
-            title: Text('Renting'),
-            leading: Icon(Icons.agriculture),
-            onTap: () {
-              //Navigate to the renting module
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => AdminRentRequestsScreen()),
-              );
-            },
-          ),
-          ListTile(
-            title: Text('Weather Forecast'),
-            leading: Icon(Icons.cloud),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Forecaste()),
-              );
-              // Navigate to the weather forecast module
-            },
-          ),
+          // ListTile(
+          //   title: Text('Renting'),
+          //   leading: Icon(Icons.agriculture),
+          //   onTap: () {
+          //     //Navigate to the renting module
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //           builder: (context) => AdminRentRequestsScreen()),
+          //     );
+          //   },
+          // ),
+          // ListTile(
+          //   title: Text('Weather Forecast'),
+          //   leading: Icon(Icons.cloud),
+          //   onTap: () {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(builder: (context) => const Forecaste()),
+          //     );
+          //     // Navigate to the weather forecast module
+          //   },
+          // ),
           ListTile(
             title: Text('Rates'),
             leading: Icon(Icons.attach_money),

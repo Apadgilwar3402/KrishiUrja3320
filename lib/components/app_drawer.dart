@@ -19,7 +19,6 @@ class AppDrawer extends StatelessWidget {
     String photoUrl = user?.photoURL ?? '';
 
     return Drawer(
-      child: SingleChildScrollView(
         child: Column(
           children: <Widget>[
             DrawerHeader(
@@ -109,7 +108,6 @@ class AppDrawer extends StatelessWidget {
             ),
           ],
         ),
-      ),
     );
   }
 }
